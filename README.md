@@ -1,7 +1,7 @@
 # tracker-depenses
 Petite application web pour suivre mes dépenses semaine par semaine, voir où part l'argent par catégorie et garder un œil sur mon budget.
 
-➡️ **[Ouvrir l'application](https://jonathan-ouattara.github.io/tracker-depenses/)**
+➡️ **[Ouvrir l'application](https://jonathan0uattara.github.io/tracker-depenses/)**
 
 ## Fonctionnalités
 
