@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mes dépenses de la semaine</title>
+<title>Mes dépenses du mois</title>
 <meta name="theme-color" content="#1f5f4a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
     font-size:20px;cursor:pointer;color:var(--ink);flex-shrink:0;line-height:1;transition:.12s}
   .weeknav button:hover:not(:disabled){border-color:var(--green);color:var(--green)}
   .weeknav .wk{flex:1;text-align:center}
-  .weeknav .wk .wl{font-size:15px;font-weight:700;line-height:1.15}
+  .weeknav .wk .wl{font-size:16px;font-weight:700;line-height:1.15;text-transform:capitalize}
   .weeknav .wk .wt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--green);margin-top:2px}
   .weeknav .wk .wt.past{color:var(--muted)}
   .today-btn{display:block;width:100%;text-align:center;border:none;background:none;color:var(--green);
@@ -77,7 +77,6 @@
   .btn:hover{background:#2c3a31}
   .btn:active{transform:translateY(1px)}
 
-  /* éditeur de catégories */
   .cat-edit-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
   .cat-edit-row .catname{flex:1}
   .cat-edit-row .catbud{width:88px;text-align:right;font-family:'JetBrains Mono',monospace}
@@ -101,12 +100,18 @@
   .cat-rest{font-size:12px;margin-top:4px;font-weight:600}
   .cat-rest.ok{color:var(--green)} .cat-rest.bad{color:var(--coral)} .cat-rest.none{color:var(--muted)}
 
-  .day-group{margin-bottom:16px}
-  .day-head{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:7px;
-    border-bottom:1.5px solid var(--line);margin-bottom:8px}
+  /* historique dépliable par jour */
+  .day-group{margin-bottom:8px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}
+  .day-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none;user-select:none}
+  .day-head::-webkit-details-marker{display:none}
+  .day-head .chev{font-size:16px;color:var(--muted);transition:transform .18s;flex-shrink:0}
+  .day-group[open] .day-head .chev{transform:rotate(90deg)}
   .day-head .d{font-size:14px;font-weight:700;text-transform:capitalize}
-  .day-head .dt{font-size:13px;font-weight:700;color:var(--green)}
-  .exp{display:flex;align-items:center;gap:10px;padding:7px 0}
+  .day-head .cnt{font-size:12px;color:var(--muted);font-weight:600}
+  .day-head .dt{margin-left:auto;font-size:14px;font-weight:700;color:var(--green)}
+  .day-body{padding:2px 14px 10px 14px;border-top:1px solid var(--line)}
+  .exp{display:flex;align-items:center;gap:10px;padding:8px 0}
+  .exp+.exp{border-top:1px solid var(--cream)}
   .exp .dot{width:8px;height:8px;border-radius:99px;background:var(--green);flex-shrink:0}
   .exp .cat{font-size:13px;color:var(--muted);font-weight:600;min-width:0}
   .exp .note{font-size:14px;font-weight:600;margin-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -115,7 +120,7 @@
   .exp .del:hover{color:var(--coral)}
 
   .empty{text-align:center;color:var(--muted);font-size:14px;padding:24px 0}
-  .footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:12px;color:var(--muted)}
+  .footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px;color:var(--muted)}
   .reset{border:none;background:none;color:var(--coral);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline}
   .loading{text-align:center;color:var(--muted);padding:40px 0;font-size:14px}
   .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.4}
@@ -123,23 +128,23 @@
 
 <div class="wrap">
   <header>
-    <div class="kicker">Suivi hebdo</div>
+    <div class="kicker">Suivi mensuel</div>
     <h1>Mes dépenses 💸</h1>
   </header>
 
   <div class="weeknav">
-    <button id="prev" title="Semaine précédente">‹</button>
-    <div class="wk"><div class="wl" id="weekLabel">—</div><div class="wt" id="weekTag"></div></div>
-    <button id="next" title="Semaine suivante">›</button>
+    <button id="prev" title="Mois précédent">‹</button>
+    <div class="wk"><div class="wl" id="monthLabel">—</div><div class="wt" id="monthTag"></div></div>
+    <button id="next" title="Mois suivant">›</button>
   </div>
-  <button class="today-btn" id="todayBtn" style="display:none">Revenir à cette semaine</button>
+  <button class="today-btn" id="todayBtn" style="display:none">Revenir au mois en cours</button>
 
   <div class="total-card" id="totalCard">
     <div class="lbl" id="totalLbl">Total dépensé</div>
     <div class="val"><span id="total" class="num">0,00</span><span class="cur">€</span></div>
     <div class="meta">
       <div class="m"><div class="mk">Dépensé</div><div class="mv num" id="mSpent">0,00 €</div></div>
-      <div class="m"><div class="mk">Budget total</div><div class="mv num" id="mBudget">—</div></div>
+      <div class="m"><div class="mk">Budget mensuel</div><div class="mv num" id="mBudget">—</div></div>
     </div>
     <div class="ttrack" id="ttrack" style="display:none"><div class="tfill" id="tfill" style="width:0%"></div></div>
   </div>
@@ -149,7 +154,7 @@
     <div class="row">
       <div style="flex:1"><label>Montant (€)</label>
         <input id="amt" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00"></div>
-      <div style="flex:1.4"><label>Jour</label><select id="day"></select></div>
+      <div style="flex:1.2"><label>Date</label><input id="day" type="date"></div>
     </div>
     <label>Catégorie</label>
     <div class="chips" id="chips"></div>
@@ -165,7 +170,7 @@
     <div id="budEdit" style="display:none">
       <div id="budRows"></div>
       <button class="addcat" id="addCat">+ Ajouter une catégorie</button>
-      <div class="hint">Renomme une catégorie en modifiant son nom. Mets son budget hebdo à droite (0 = pas de suivi). Le budget s'applique à chaque semaine.</div>
+      <div class="hint">Renomme une catégorie en modifiant son nom. Mets son budget <b>mensuel</b> à droite (0 = pas de suivi).</div>
       <div style="height:12px"></div>
       <button class="btn" id="saveBud">Enregistrer</button>
     </div>
@@ -177,11 +182,11 @@
   </div>
 
   <div class="card">
-    <h2>Détail par jour</h2>
+    <h2>Historique du mois</h2>
     <div id="list"><div class="loading">Chargement…</div></div>
     <div class="footer">
       <span id="count">0 dépense</span>
-      <button class="reset" id="reset">Effacer cette semaine</button>
+      <button class="reset" id="reset">Effacer ce mois</button>
     </div>
   </div>
 
@@ -204,25 +209,23 @@ const DEFAULT_CATS = [
   {id:"tel", name:"Tél / Internet"}, {id:"etudes", name:"Études / matériel"},
   {id:"vetements", name:"Vêtements"}, {id:"autre", name:"Autre"},
 ];
-const DAYS = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 
 let expenses = [];       // {id, amt, cat, date:"yyyy-mm-dd", note}
-let categories = [];     // {id, name, budget}
+let categories = [];     // {id, name, budget}  (budget = mensuel)
 let selectedCat = null;
-let viewedMonday = mondayOf(new Date());
+let viewedMonth = monthStart(new Date());
 
 const eur = n => n.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
 const catName = id => { const c=categories.find(x=>x.id===id); return c?c.name:"(catégorie supprimée)"; };
 const newId = () => "c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
-function mondayOf(d){
-  const dt=new Date(d); dt.setHours(0,0,0,0);
-  const js=dt.getDay(); dt.setDate(dt.getDate()+(js===0?-6:1-js)); return dt;
-}
+function monthStart(d){ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(1); return x; }
+function addMonths(d,n){ const x=new Date(d); x.setMonth(x.getMonth()+n); return x; }
 function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function parseYmd(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
-function weekKeyOf(s){ return ymd(mondayOf(parseYmd(s))); }
+function monthKey(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+function monthKeyOf(s){ return s.slice(0,7); }   // "yyyy-mm" depuis "yyyy-mm-dd"
 
 // --- stockage hybride : window.storage dans Claude, localStorage en app autonome ---
 const hasClaudeStore = (typeof window!=="undefined" && window.storage && typeof window.storage.get==="function");
@@ -242,25 +245,22 @@ function defaultCategories(oldBudgets){
   return DEFAULT_CATS.map(c=>({id:c.id,name:c.name,budget:Number(oldBudgets[c.id])||0}));
 }
 
-// --- chargement (+ migration) ---
 async function load(){
   try{
     const val=await store.get(KEY);
     if(val){
       const data=JSON.parse(val);
       const raw=Array.isArray(data)?data:(data.expenses||[]);
-      // catégories : nouveau format sinon reconstruit depuis défaut + anciens budgets
       if(!Array.isArray(data) && Array.isArray(data.categories) && data.categories.length){
         categories=data.categories.map(c=>({id:c.id||newId(),name:c.name||"Catégorie",budget:Number(c.budget)||0}));
       }else{
         categories=defaultCategories(!Array.isArray(data)?data.budgets:null);
       }
-      // dépenses : ajout d'une date réelle si ancien format (jour index)
-      const curMon=mondayOf(new Date());
+      const today=ymd(new Date());
       expenses=raw.map(e=>{
         if(e.date) return e;
-        const dd=(typeof e.day==="number")?ymd(addDays(curMon,e.day)):ymd(curMon);
-        return {id:e.id,amt:e.amt,cat:e.cat,note:e.note||"",date:dd};
+        // ancien format "jour de semaine" : on rattache à aujourd'hui faute de mieux
+        return {id:e.id,amt:e.amt,cat:e.cat,note:e.note||"",date:today};
       });
     }else{
       categories=defaultCategories();
@@ -268,13 +268,13 @@ async function load(){
   }catch(e){ categories=defaultCategories(); expenses=[]; }
   if(!categories.length) categories=defaultCategories();
   selectedCat=categories[0].id;
-  buildChips(); buildBudgetEditor(); buildDaySelect();
+  buildChips(); buildBudgetEditor(); refreshDateDefault();
   await save();
   render();
 }
 async function save(){ await store.set(KEY, JSON.stringify({expenses, categories})); }
 
-// --- chips catégories (dynamiques) ---
+// --- chips catégories ---
 const chipsEl=document.getElementById("chips");
 function buildChips(){
   chipsEl.innerHTML="";
@@ -286,40 +286,36 @@ function buildChips(){
   });
 }
 
-// --- sélecteur de jour ---
-function buildDaySelect(){
-  const sel=document.getElementById("day"); sel.innerHTML="";
-  const todayStr=ymd(new Date());
-  for(let i=0;i<7;i++){
-    const d=addDays(viewedMonday,i), v=ymd(d);
-    const o=document.createElement("option"); o.value=v;
-    let lbl=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"short"});
-    lbl=lbl.charAt(0).toUpperCase()+lbl.slice(1);
-    if(v===todayStr) lbl+=" — aujourd'hui";
-    o.textContent=lbl; sel.appendChild(o);
-  }
-  sel.value=(weekKeyOf(todayStr)===ymd(viewedMonday))?todayStr:ymd(viewedMonday);
+// --- date par défaut du champ d'ajout ---
+function refreshDateDefault(){
+  const di=document.getElementById("day");
+  const now=new Date();
+  di.value = (monthKey(viewedMonth)===monthKey(now)) ? ymd(now) : ymd(viewedMonth);
 }
 
 document.getElementById("add").onclick=()=>{
   const raw=document.getElementById("amt").value.replace(",","."); const amt=parseFloat(raw);
   if(!amt||amt<=0){ document.getElementById("amt").focus(); return; }
-  expenses.push({id:Date.now(),amt,cat:selectedCat,date:document.getElementById("day").value,note:document.getElementById("note").value.trim()});
+  const dateVal=document.getElementById("day").value || ymd(new Date());
+  expenses.push({id:Date.now(),amt,cat:selectedCat,date:dateVal,note:document.getElementById("note").value.trim()});
   document.getElementById("amt").value=""; document.getElementById("note").value="";
-  document.getElementById("amt").focus(); save(); render();
+  // si la dépense ajoutée est dans un autre mois, on se place dessus pour la voir
+  viewedMonth=monthStart(parseYmd(dateVal));
+  refreshDateDefault(); document.getElementById("amt").focus();
+  save(); render();
 };
 document.getElementById("amt").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("add").click(); });
 
 document.getElementById("reset").onclick=()=>{
-  const wk=ymd(viewedMonday);
-  if(expenses.some(e=>weekKeyOf(e.date)===wk) && confirm("Effacer les dépenses de cette semaine ? (catégories, budgets et autres semaines gardés)")){
-    expenses=expenses.filter(e=>weekKeyOf(e.date)!==wk); save(); render();
+  const mk=monthKey(viewedMonth);
+  if(expenses.some(e=>monthKeyOf(e.date)===mk) && confirm("Effacer toutes les dépenses de ce mois ? (catégories, budgets et autres mois gardés)")){
+    expenses=expenses.filter(e=>monthKeyOf(e.date)!==mk); save(); render();
   }
 };
 
-document.getElementById("prev").onclick=()=>{ viewedMonday=addDays(viewedMonday,-7); buildDaySelect(); render(); };
-document.getElementById("next").onclick=()=>{ viewedMonday=addDays(viewedMonday,7); buildDaySelect(); render(); };
-document.getElementById("todayBtn").onclick=()=>{ viewedMonday=mondayOf(new Date()); buildDaySelect(); render(); };
+document.getElementById("prev").onclick=()=>{ viewedMonth=addMonths(viewedMonth,-1); refreshDateDefault(); render(); };
+document.getElementById("next").onclick=()=>{ viewedMonth=addMonths(viewedMonth,1); refreshDateDefault(); render(); };
+document.getElementById("todayBtn").onclick=()=>{ viewedMonth=monthStart(new Date()); refreshDateDefault(); render(); };
 
 // --- éditeur de catégories ---
 function addCatRow(id,name,budget){
@@ -361,13 +357,12 @@ document.getElementById("saveBud").onclick=()=>{
   });
   if(!next.length){ alert("Garde au moins une catégorie avec un nom."); return; }
   categories=next;
-  // réaffecter les dépenses dont la catégorie a disparu
   const ids=new Set(categories.map(c=>c.id));
   const fallback=categories[0].id;
   expenses.forEach(e=>{ if(!ids.has(e.cat)) e.cat=fallback; });
   if(!ids.has(selectedCat)) selectedCat=categories[0].id;
   buildChips();
-  document.getElementById("toggleBud").click(); // referme
+  document.getElementById("toggleBud").click();
   save(); render();
 };
 
@@ -375,27 +370,26 @@ const totalBudget=()=>categories.reduce((s,c)=>s+(c.budget||0),0);
 
 // --- rendu ---
 function render(){
-  const wk=ymd(viewedMonday), curWk=ymd(mondayOf(new Date()));
-  const weekExp=expenses.filter(e=>weekKeyOf(e.date)===wk);
+  const mk=monthKey(viewedMonth), curMk=monthKey(new Date());
+  const monthExp=expenses.filter(e=>monthKeyOf(e.date)===mk);
 
-  const start=viewedMonday, end=addDays(viewedMonday,6);
-  const sameMonth=start.getMonth()===end.getMonth();
-  const fmt=(d,wm)=>d.toLocaleDateString("fr-FR",wm?{day:"numeric",month:"short"}:{day:"numeric"});
-  document.getElementById("weekLabel").textContent="Semaine du "+fmt(start,!sameMonth)+" au "+fmt(end,true);
-  const tag=document.getElementById("weekTag");
-  if(wk===curWk){ tag.textContent="Cette semaine"; tag.className="wt"; }
-  else if(wk<curWk){ tag.textContent="Semaine passée"; tag.className="wt past"; }
-  else { tag.textContent="Semaine à venir"; tag.className="wt past"; }
-  document.getElementById("todayBtn").style.display=(wk===curWk)?"none":"block";
+  let ml=viewedMonth.toLocaleDateString("fr-FR",{month:"long",year:"numeric"});
+  ml=ml.charAt(0).toUpperCase()+ml.slice(1);
+  document.getElementById("monthLabel").textContent=ml;
+  const tag=document.getElementById("monthTag");
+  if(mk===curMk){ tag.textContent="Mois en cours"; tag.className="wt"; }
+  else if(mk<curMk){ tag.textContent="Mois passé"; tag.className="wt past"; }
+  else { tag.textContent="Mois à venir"; tag.className="wt past"; }
+  document.getElementById("todayBtn").style.display=(mk===curMk)?"none":"block";
 
-  const spent=weekExp.reduce((s,e)=>s+e.amt,0);
+  const spent=monthExp.reduce((s,e)=>s+e.amt,0);
   const budTot=totalBudget();
   const card=document.getElementById("totalCard");
   document.getElementById("mSpent").textContent=eur(spent)+" €";
   document.getElementById("mBudget").textContent=budTot>0?eur(budTot)+" €":"—";
   if(budTot>0){
     const rest=budTot-spent;
-    document.getElementById("totalLbl").textContent=rest>=0?"Reste à dépenser":"Dépassement";
+    document.getElementById("totalLbl").textContent=rest>=0?"Reste ce mois-ci":"Dépassement";
     document.getElementById("total").textContent=eur(Math.abs(rest));
     card.classList.toggle("over",rest<0);
     document.getElementById("ttrack").style.display="block";
@@ -407,15 +401,15 @@ function render(){
   }
 
   document.getElementById("budView").innerHTML = budTot>0
-    ? `<div class="hint">Budget hebdo total : <b>${eur(budTot)} €</b>, sur ${categories.length} catégorie(s). Clique « Modifier » pour ajouter, renommer ou supprimer.</div>`
-    : `<div class="hint">Aucun budget défini. Clique « Modifier » pour fixer un budget, ajouter, renommer ou supprimer des catégories.</div>`;
+    ? `<div class="hint">Budget mensuel total : <b>${eur(budTot)} €</b>, sur ${categories.length} catégorie(s). Clique « Modifier » pour ajouter, renommer ou supprimer.</div>`
+    : `<div class="hint">Aucun budget défini. Clique « Modifier » pour fixer un budget mensuel, ajouter, renommer ou supprimer des catégories.</div>`;
 
-  const n=weekExp.length;
-  document.getElementById("count").textContent=n+(n>1?" dépenses":" dépense");
+  const n=monthExp.length;
+  document.getElementById("count").textContent=n+(n>1?" dépenses ce mois":" dépense ce mois");
 
-  // suivi par catégorie
+  // suivi par catégorie (mois)
   const byCatCard=document.getElementById("byCatCard"), byCat=document.getElementById("byCat");
-  const sums={}; weekExp.forEach(e=>sums[e.cat]=(sums[e.cat]||0)+e.amt);
+  const sums={}; monthExp.forEach(e=>sums[e.cat]=(sums[e.cat]||0)+e.amt);
   const shown=categories.filter(c=>(c.budget||0)>0||(sums[c.id]||0)>0).map(c=>({id:c.id,name:c.name,budget:c.budget||0}));
   Object.keys(sums).forEach(id=>{ if(!categories.find(c=>c.id===id)) shown.push({id,name:"(catégorie supprimée)",budget:0}); });
   shown.sort((a,b)=>(sums[b.id]||0)-(sums[a.id]||0));
@@ -438,28 +432,35 @@ function render(){
     }).join("");
   }
 
-  // détail par jour
+  // historique du mois, groupé par jour (du plus récent au plus ancien), dépliable
   const list=document.getElementById("list");
-  if(!n){ list.innerHTML='<div class="empty">Aucune dépense cette semaine.<br>Ajoute-en une 👆</div>'; return; }
+  if(!n){ list.innerHTML='<div class="empty">Aucune dépense ce mois-ci.<br>Ajoute-en une 👆</div>'; return; }
+  const daysInMonth=new Date(viewedMonth.getFullYear(), viewedMonth.getMonth()+1, 0).getDate();
+  const isPast = mk<curMk;
   let html="";
-  for(let i=0;i<7;i++){
-    const dStr=ymd(addDays(viewedMonday,i));
-    const items=weekExp.filter(e=>e.date===dStr).sort((a,b)=>b.id-a.id);
+  for(let day=daysInMonth; day>=1; day--){
+    const dStr=ymd(new Date(viewedMonth.getFullYear(), viewedMonth.getMonth(), day));
+    const items=monthExp.filter(e=>e.date===dStr).sort((a,b)=>b.id-a.id);
     if(!items.length) continue;
     const dtot=items.reduce((s,e)=>s+e.amt,0);
-    let dl=addDays(viewedMonday,i).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"short"});
+    let dl=parseYmd(dStr).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
     dl=dl.charAt(0).toUpperCase()+dl.slice(1);
-    html+=`<div class="day-group"><div class="day-head"><span class="d">${dl}</span><span class="dt num">${eur(dtot)} €</span></div>`;
+    html+=`<details class="day-group" ${isPast?'':'open'}>
+      <summary class="day-head"><span class="chev">›</span><span class="d">${dl}</span>
+        <span class="cnt">· ${items.length}</span><span class="dt num">${eur(dtot)} €</span></summary>
+      <div class="day-body">`;
     items.forEach(e=>{
       html+=`<div class="exp"><span class="dot"></span><span class="cat">${escapeHtml(catName(e.cat))}</span>
         ${e.note?`<span class="note">· ${escapeHtml(e.note)}</span>`:""}
         <span class="px num">${eur(e.amt)} €</span>
         <button class="del" data-id="${e.id}" title="Supprimer">×</button></div>`;
     });
-    html+=`</div>`;
+    html+=`</div></details>`;
   }
   list.innerHTML=html;
-  list.querySelectorAll(".del").forEach(b=>{ b.onclick=()=>{ expenses=expenses.filter(e=>e.id!=b.dataset.id); save(); render(); }; });
+  list.querySelectorAll(".del").forEach(b=>{
+    b.onclick=(ev)=>{ ev.stopPropagation(); expenses=expenses.filter(e=>e.id!=b.dataset.id); save(); render(); };
+  });
 }
 
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
@@ -480,8 +481,8 @@ document.getElementById("importFile").onchange=(ev)=>{
       const data=JSON.parse(rd.result);
       if(!confirm("Importer remplacera les données actuelles de cet appareil. Continuer ?")){ ev.target.value=""; return; }
       const raw=Array.isArray(data)?data:(data.expenses||[]);
-      const curMon=mondayOf(new Date());
-      expenses=raw.map(e=>e.date?e:{id:e.id,amt:e.amt,cat:e.cat,note:e.note||"",date:ymd(curMon)});
+      const today=ymd(new Date());
+      expenses=raw.map(e=>e.date?e:{id:e.id,amt:e.amt,cat:e.cat,note:e.note||"",date:today});
       if(!Array.isArray(data) && Array.isArray(data.categories) && data.categories.length){
         categories=data.categories.map(c=>({id:c.id||newId(),name:c.name||"Catégorie",budget:Number(c.budget)||0}));
       }else if(!Array.isArray(data) && data.budgets){
